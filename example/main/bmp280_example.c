@@ -92,6 +92,15 @@ void app_main(void)
     printf("  Pressure: %.2f hPa\n", bmp280_data.pressure / 100.0); // Convert Pa to hPa
   }
 
+  // Read the temperature oversampling setting before reset
+  BMP280OversamplingMode temp_oversampling_before_reset;
+  esp_err_t oversampling_status_before = bmp280_get_mode(&bmp280_dev_handle, &temp_oversampling_before_reset, NULL, NULL);
+  if (oversampling_status_before != ESP_OK) {
+    printf("Failed to read temperature oversampling before reset: %s\n", esp_err_to_name(oversampling_status_before));
+    return;
+  }
+  printf("Temperature oversampling before reset: %d\n", temp_oversampling_before_reset);
+
   // Reset the BMP280 chip
   esp_err_t reset_status = bmp280_reset_chip(&bmp280_dev_handle);
   if (reset_status != ESP_OK) {
@@ -106,7 +115,7 @@ void app_main(void)
     printf("Failed to read temperature oversampling after reset: %s\n", esp_err_to_name(oversampling_status));
     return;
   }
-  printf("Temperature oversampling after reset: %d (should be 1 for default)\n", temp_oversampling_after_reset);
+  printf("Temperature oversampling after reset: %d (should be 0 for default)\n", temp_oversampling_after_reset);
 
   // Deinitialize BMP280 sensor
   esp_err_t deinit_status = bmp280_deinit(&bmp280_bus_handle, &bmp280_dev_handle);
