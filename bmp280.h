@@ -1,32 +1,15 @@
 #ifndef BMP280_H
 #define BMP280_H
 
+#include <stdint.h>
+#include <stdbool.h>
+#include "esp_err.h"
+#include "driver/i2c_types.h"
+#include "driver/i2c_master.h"
+#include "driver/gpio.h"
+
 // Suggested BMP280 I2C Master clock frequency
 #define BMP280_I2C_MASTER_FREQ_HZ          100000  // 100kHz
-
-/* Public function declarations */
-esp_err_t bmp280_init(i2c_master_bus_handle_t *bus_handle, i2c_master_dev_handle_t *dev_handle, bmp280_params_t *params);
-esp_err_t bmp280_deinit(i2c_master_bus_handle_t *bus_handle, i2c_master_dev_handle_t *dev_handle);
-esp_err_t bmp280_get_chip_id(i2c_master_dev_handle_t * dev_handle, uint8_t * chip_id);
-esp_err_t bmp280_reset_chip(i2c_master_dev_handle_t * dev_handle);
-esp_err_t bmp280_force_measurement(i2c_master_dev_handle_t * dev_handle);
-esp_err_t bmp280_is_updating_nvm(i2c_master_dev_handle_t * dev_handle, bool * value);
-esp_err_t bmp280_is_measuring(i2c_master_dev_handle_t * dev_handle, bool * value);
-esp_err_t bmp280_wait_measurement_done(i2c_master_dev_handle_t * dev_handle);
-esp_err_t bmp280_set_config_raw(i2c_master_dev_handle_t * dev_handle, uint8_t config);
-esp_err_t bmp280_get_config_raw(i2c_master_dev_handle_t * dev_handle, uint8_t * config);
-esp_err_t bmp280_set_config(i2c_master_dev_handle_t * dev_handle, BMP280Filter filter, BMP280StandbyTime standby);
-esp_err_t bmp280_get_filter_standby(i2c_master_dev_handle_t * dev_handle, BMP280Filter * filter, BMP280StandbyTime * standby);
-esp_err_t bmp280_set_mode_raw(i2c_master_dev_handle_t * dev_handle, uint8_t mode);
-esp_err_t bmp280_get_mode_raw(i2c_master_dev_handle_t * dev_handle, uint8_t * mode);
-esp_err_t bmp280_set_mode(i2c_master_dev_handle_t * dev_handle, BMP280OversamplingMode temperature_oversampling, BMP280OversamplingMode pressure_oversampling, BMP280Mode device_mode);
-esp_err_t bmp280_get_mode(i2c_master_dev_handle_t * dev_handle, BMP280OversamplingMode * temperature_oversampling, BMP280OversamplingMode * pressure_oversampling, BMP280Mode * device_mode);
-esp_err_t bmp280_read_data_raw(i2c_master_dev_handle_t * dev_handle, int32_t * raw_pressure, int32_t * raw_temperature);
-int32_t bmp280_compensate_temperature(int32_t adc_temp, bmp280_calibration_data_t * data);
-void bmp280_apply_temperature_fine(int32_t temperature, bmp280_calibration_data_t * data);
-uint32_t bmp280_compensate_pressure(int32_t adc_pres, bmp280_calibration_data_t * data);
-esp_err_t bmp280_read_calibration_data(i2c_master_dev_handle_t * dev_handle, bmp280_calibration_data_t * data);
-esp_err_t bmp280_read(i2c_master_dev_handle_t * dev_handle, bmp280_calibration_data_t * calib_data, bmp280_data_t * bmp280_data);
 
 // Enums
 /*
@@ -119,5 +102,29 @@ typedef struct
 
     int32_t temp_fine;
 } bmp280_calibration_data_t;
+
+/* Public function declarations */
+esp_err_t bmp280_init(i2c_master_bus_handle_t *bus_handle, i2c_master_dev_handle_t *dev_handle, bmp280_params_t *params);
+esp_err_t bmp280_deinit(i2c_master_bus_handle_t *bus_handle, i2c_master_dev_handle_t *dev_handle);
+esp_err_t bmp280_get_chip_id(i2c_master_dev_handle_t * dev_handle, uint8_t * chip_id);
+esp_err_t bmp280_reset_chip(i2c_master_dev_handle_t * dev_handle);
+esp_err_t bmp280_force_measurement(i2c_master_dev_handle_t * dev_handle);
+esp_err_t bmp280_is_updating_nvm(i2c_master_dev_handle_t * dev_handle, bool * value);
+esp_err_t bmp280_is_measuring(i2c_master_dev_handle_t * dev_handle, bool * value);
+esp_err_t bmp280_wait_measurement_done(i2c_master_dev_handle_t * dev_handle);
+esp_err_t bmp280_set_config_raw(i2c_master_dev_handle_t * dev_handle, uint8_t config);
+esp_err_t bmp280_get_config_raw(i2c_master_dev_handle_t * dev_handle, uint8_t * config);
+esp_err_t bmp280_set_config(i2c_master_dev_handle_t * dev_handle, BMP280Filter filter, BMP280StandbyTime standby);
+esp_err_t bmp280_get_filter_standby(i2c_master_dev_handle_t * dev_handle, BMP280Filter * filter, BMP280StandbyTime * standby);
+esp_err_t bmp280_set_mode_raw(i2c_master_dev_handle_t * dev_handle, uint8_t mode);
+esp_err_t bmp280_get_mode_raw(i2c_master_dev_handle_t * dev_handle, uint8_t * mode);
+esp_err_t bmp280_set_mode(i2c_master_dev_handle_t * dev_handle, BMP280OversamplingMode temperature_oversampling, BMP280OversamplingMode pressure_oversampling, BMP280Mode device_mode);
+esp_err_t bmp280_get_mode(i2c_master_dev_handle_t * dev_handle, BMP280OversamplingMode * temperature_oversampling, BMP280OversamplingMode * pressure_oversampling, BMP280Mode * device_mode);
+esp_err_t bmp280_read_data_raw(i2c_master_dev_handle_t * dev_handle, int32_t * raw_pressure, int32_t * raw_temperature);
+int32_t bmp280_compensate_temperature(int32_t adc_temp, bmp280_calibration_data_t * data);
+void bmp280_apply_temperature_fine(int32_t temperature, bmp280_calibration_data_t * data);
+uint32_t bmp280_compensate_pressure(int32_t adc_pres, bmp280_calibration_data_t * data);
+esp_err_t bmp280_read_calibration_data(i2c_master_dev_handle_t * dev_handle, bmp280_calibration_data_t * data);
+esp_err_t bmp280_read(i2c_master_dev_handle_t * dev_handle, bmp280_calibration_data_t * calib_data, bmp280_data_t * bmp280_data);
 
 #endif // BMP280_H

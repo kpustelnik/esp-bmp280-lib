@@ -1,7 +1,7 @@
 #include <stdio.h>
-#include "sdkconfig.h"
+#include "freertos/FreeRTOS.h"
+#include "freertos/task.h"
 #include "esp_log.h"
-#include "driver/i2c_master.h"
 #include "bmp280.h"
 
 static char *TAG = "BMP280";
@@ -55,7 +55,7 @@ esp_err_t bmp280_init(i2c_master_bus_handle_t *bus_handle, i2c_master_dev_handle
     };
     if (params->use_lp_i2c) {
         #if SOC_LP_I2C_SUPPORTED
-            bus_config.lp_source_clk = clk_source;
+            bus_config.lp_source_clk = params->clk_source;
         #else
             ESP_LOGE(TAG, "LP I2C not supported on this SoC");
             return ESP_ERR_INVALID_ARG;
@@ -524,11 +524,11 @@ esp_err_t bmp280_read(i2c_master_dev_handle_t * dev_handle, bmp280_calibration_d
 
     // Read raw temperature and pressure
     int32_t raw_pressure, raw_temperature;
-    result_code = bmp280_read_data_raw(&dev_handle, &raw_temperature, &raw_pressure);
+    result_code = bmp280_read_data_raw(dev_handle, &raw_pressure, &raw_temperature);
     if (result_code != ESP_OK) return result_code;
 
-    int32_t temperature = compensate_temperature(raw_temperature, &calib_data);
-    uint32_t pressure = compensate_pressure(raw_pressure, &calib_data);
+    int32_t temperature = bmp280_compensate_temperature(raw_temperature, calib_data);
+    uint32_t pressure = bmp280_compensate_pressure(raw_pressure, calib_data);
 
     bmp280_data->temperature = (float) temperature / 100;
     bmp280_data->pressure = (float) pressure / 256;
