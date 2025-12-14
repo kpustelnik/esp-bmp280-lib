@@ -115,7 +115,7 @@ esp_err_t bmp280_wait_measurement_done(i2c_master_dev_handle_t * dev_handle);
 esp_err_t bmp280_set_config_raw(i2c_master_dev_handle_t * dev_handle, uint8_t config);
 esp_err_t bmp280_get_config_raw(i2c_master_dev_handle_t * dev_handle, uint8_t * config);
 esp_err_t bmp280_set_config(i2c_master_dev_handle_t * dev_handle, BMP280Filter filter, BMP280StandbyTime standby);
-esp_err_t bmp280_get_filter_standby(i2c_master_dev_handle_t * dev_handle, BMP280Filter * filter, BMP280StandbyTime * standby);
+esp_err_t bmp280_get_config(i2c_master_dev_handle_t * dev_handle, BMP280Filter * filter, BMP280StandbyTime * standby);
 esp_err_t bmp280_set_mode_raw(i2c_master_dev_handle_t * dev_handle, uint8_t mode);
 esp_err_t bmp280_get_mode_raw(i2c_master_dev_handle_t * dev_handle, uint8_t * mode);
 esp_err_t bmp280_set_mode(i2c_master_dev_handle_t * dev_handle, BMP280OversamplingMode temperature_oversampling, BMP280OversamplingMode pressure_oversampling, BMP280Mode device_mode);

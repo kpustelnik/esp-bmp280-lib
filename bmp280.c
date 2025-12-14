@@ -307,7 +307,7 @@ esp_err_t bmp280_set_config(i2c_master_dev_handle_t * dev_handle, BMP280Filter f
   Returns:
   - <esp_err_t> ESP_OK on success, otherwise an error code indicating the failure reason  
 */
-esp_err_t bmp280_get_filter_standby(i2c_master_dev_handle_t * dev_handle, BMP280Filter * filter, BMP280StandbyTime * standby) {
+esp_err_t bmp280_get_config(i2c_master_dev_handle_t * dev_handle, BMP280Filter * filter, BMP280StandbyTime * standby) {
     uint8_t config;
     esp_err_t result_code = bmp280_get_config_raw(dev_handle, &config);
     if (result_code != ESP_OK) return result_code;
