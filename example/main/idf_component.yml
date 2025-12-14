@@ -1,0 +1,3 @@
+dependencies:
+  kpustelnik/esp-bmp280-lib:
+    version: "*"

@@ -33,35 +33,27 @@ static char *TAG = "BMP280";
   Arguments:
   - <i2c_master_bus_handle_t*> bus_handle: Pointer to the i2c master bus handle to be initialized
   - <i2c_master_dev_handle_t*> dev_handle: Pointer to the i2c master device handle to be initialized
-  - <i2c_port_num_t> i2c_port: I2C port number to be used
-  - <gpio_num_t> sda_io_num: GPIO number to be used for SDA signal
-  - <gpio_num_t> scl_io_num: GPIO number to be used for SCL signal
-  - <bool> use_lp_i2c: Whether to use LP I2C peripheral (if supported by the SoC)
-  - <i2c_clock_source_t> clk_source: Clock source to be used by the I2C master bus
-  - <bool> use_primary_address: Whether to use primary (0x76) or secondary (0x77) I2C address of the BMP280
-  - <uint32_t> i2c_master_freq_hz: I2C master clock frequency in Hz
+  - <bmp280_params_t*> params: Pointer to the BMP280 initialization parameters structure containing:
+    - <i2c_port_num_t> params->i2c_port: I2C port number to be used
+    - <gpio_num_t> params->sda_io_num: GPIO number to be used for SDA signal
+    - <gpio_num_t> params->scl_io_num: GPIO number to be used for SCL signal
+    - <bool> params->use_lp_i2c: Whether to use LP I2C peripheral (if supported by the SoC)
+    - <i2c_clock_source_t> params->clk_source: Clock source to be used by the I2C master bus
+    - <bool> params->use_primary_address: Whether to use primary (0x76) or secondary (0x77) I2C address of the BMP280
+    - <uint32_t> params->i2c_master_freq_hz: I2C master clock frequency in Hz
   Returns:
   - <esp_err_t> ESP_OK on success, otherwise an error code indicating the failure reason  
 */
-esp_err_t bmp280_init(i2c_master_bus_handle_t *bus_handle,
-                      i2c_master_dev_handle_t *dev_handle,
-                      i2c_port_num_t i2c_port,
-                      gpio_num_t sda_io_num,
-                      gpio_num_t scl_io_num,
-                      bool use_lp_i2c,
-                      i2c_clock_source_t clk_source,
-                      bool use_primary_address,
-                      uint32_t i2c_master_freq_hz
-                    ) {
+esp_err_t bmp280_init(i2c_master_bus_handle_t *bus_handle, i2c_master_dev_handle_t *dev_handle, bmp280_params_t *params) {
     esp_err_t result_code;
     i2c_master_bus_config_t bus_config = {
-        .i2c_port = i2c_port,
-        .sda_io_num = sda_io_num,
-        .scl_io_num = scl_io_num,
+        .i2c_port = params->i2c_port,
+        .sda_io_num = params->sda_io_num,
+        .scl_io_num = params->scl_io_num,
         .glitch_ignore_cnt = 7,
         .flags.enable_internal_pullup = true,
     };
-    if (use_lp_i2c) {
+    if (params->use_lp_i2c) {
         #if SOC_LP_I2C_SUPPORTED
             bus_config.lp_source_clk = clk_source;
         #else
@@ -69,7 +61,7 @@ esp_err_t bmp280_init(i2c_master_bus_handle_t *bus_handle,
             return ESP_ERR_INVALID_ARG;
         #endif
     } else {
-        bus_config.clk_source = clk_source;
+        bus_config.clk_source = params->clk_source;
     }
 
     result_code = i2c_new_master_bus(&bus_config, bus_handle);
@@ -77,8 +69,8 @@ esp_err_t bmp280_init(i2c_master_bus_handle_t *bus_handle,
 
     i2c_device_config_t dev_config = {
         .dev_addr_length = I2C_ADDR_BIT_LEN_7,
-        .device_address = use_primary_address ? 0x76 : 0x77,
-        .scl_speed_hz = i2c_master_freq_hz,
+        .device_address = params->use_primary_address ? 0x76 : 0x77,
+        .scl_speed_hz = params->i2c_master_freq_hz,
     };
     result_code = i2c_master_bus_add_device(*bus_handle, &dev_config, dev_handle);
     if (result_code != ESP_OK) {
