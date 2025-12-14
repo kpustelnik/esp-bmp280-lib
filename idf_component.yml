@@ -1,0 +1,17 @@
+---
+version: 1.0.0
+targets:
+  - esp32
+  - esp32c2
+  - esp32c3
+  - esp32c5
+  - esp32c6
+  - esp32c61
+  - esp32h2
+  - esp32p4
+  - esp32s2
+  - esp32s3
+description: BMP280 barometric pressure and temperature sensor driver
+url: https://github.com/kpustelnik/esp-bmp280-lib
+repository: https://github.com/kpustelnik/esp-bmp280-lib.git
+issues: https://github.com/kpustelnik/esp-bmp280-lib/issues
